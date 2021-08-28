@@ -72,7 +72,6 @@ out = torchvision.utils.make_grid(inputs)
 
 imshow(out, title=[class_names[x] for x in classes])
 
-
 #TODO: Training the model
 def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     since = time.time()
@@ -112,14 +111,14 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
                     # Backward + optimize only if in training phase
                     if phase == 'train':
-                        loss.backward()
+                        loss.backward() #loss.backward() computes dloss/dx for every parameter x which has requires_grad=True. These are accumulated into x.grad for every parameter x.
                         optimizer.step()
 
                 # Statistics
-                running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
+                running_loss += loss.item() * inputs.size(0) #input.size(0) ??????????
+                running_corrects += torch.sum(preds == labels.data) # ??????????
             if phase == 'train':
-                scheduler.step()
+                scheduler.step() # if we don’t call it, the learning rate won’t be changed and stays at the initial value.
 
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
@@ -139,7 +138,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
     # load best model weights
     model.load_state_dict(best_model_wts)
-    return model
+    return model, best_acc
 
 #TODO: Visualizing the model predictions (Generic function to display predictions for a few images)
 def visualize_model(model, num_images=6):
@@ -171,6 +170,7 @@ def visualize_model(model, num_images=6):
 
 
 #TODO: FINE-TUNING the convnet (Load a pretrained model and reset final fully connected layer)
+print('FINE-TUNING')
 model_ft = models.resnet18(pretrained=True) # calling resnet we can construct a model with random weights
 num_ftrs = model_ft.fc.in_features
 # Here the size of each output sample is set to 2.
@@ -184,13 +184,12 @@ criterion = nn.CrossEntropyLoss()
 # Observe that all parameters are being optimized
 optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 
-# Decay LR by a factor of 0.1 every 7 epochs
+# Decay LR (learning rate) by a factor of 0.1 every 7 epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 
 #TODO:Train and evaluate
-model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
-                       num_epochs=25)
+model_ft, fine_tuning_acc = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=25)
 
 visualize_model(model_ft)
 
@@ -198,6 +197,7 @@ visualize_model(model_ft)
 
 #TODO: ConvNet as FIXED FEATURE EXTRACTOR (Here, we need to freeze all the network except the final layer. We need to
 # set requires_grad == False to freeze the parameters so that the gradients are not computed in backward() )
+print('FIXED FEATURES EXTRACTOR')
 model_conv = torchvision.models.resnet18(pretrained=True)
 for param in model_conv.parameters():
     param.requires_grad = False
@@ -217,9 +217,15 @@ optimizer_conv = optim.SGD(model_conv.fc.parameters(), lr=0.001, momentum=0.9)
 # Decay LR by a factor of 0.1 every 7 epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
 
+#TODO: Train and evaluate
+model_conv, feature_extractor_acc = train_model(model_conv, criterion, optimizer_conv, exp_lr_scheduler, num_epochs=25)
+
+
+
 
 #TODO:Train and evaluate
 visualize_model(model_conv)
 
 plt.ioff()
 plt.show()
+
