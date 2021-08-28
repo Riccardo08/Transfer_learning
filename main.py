@@ -220,10 +220,6 @@ exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
 #TODO: Train and evaluate
 model_conv, feature_extractor_acc = train_model(model_conv, criterion, optimizer_conv, exp_lr_scheduler, num_epochs=25)
 
-
-
-
-#TODO:Train and evaluate
 visualize_model(model_conv)
 
 plt.ioff()
