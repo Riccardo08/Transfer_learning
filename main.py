@@ -34,8 +34,8 @@ data_transforms = {
     ]),
 }
 
-data_dir = 'data/hymenoptera_data'
-# data_dir = "C:\\Users\\ricme\\Desktop\\Politecnico\\Tesi magistrale\\TL_coding\\hants_and_bees\\data\\hymenoptera_data"
+# data_dir = 'data/hymenoptera_data'
+data_dir = "C:\\Users\\ricme\\Desktop\\Politecnico\\Tesi magistrale\\TL_coding\\hants_and_bees\\data\\hymenoptera_data"
 
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
                   for x in ['train', 'val']}
