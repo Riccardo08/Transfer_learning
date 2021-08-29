@@ -2,12 +2,15 @@
 
 from __future__ import print_function, division
 import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.optim import lr_scheduler
+import torch.nn as nn # All neural network models, nn.Linear, nn.Conv2d, BatchNorm, Loss functions
+import torch.optim as optim # For all optimization algoritms, SGD, Adam, etc.
+from torch.optim import lr_scheduler # To change (update) the learning rate.
+import torch.nn.functional as F # All functions that don't have any parameters.
 import numpy as np
 import torchvision
-from torchvision import datasets, models, transforms
+from torchvision import datasets # Has standard datasets that we can import in a nice way.
+from torchvision import models
+from torchvision import transforms # Transormations we can perform on our datasets.
 import matplotlib.pyplot as plt
 import time
 import os
@@ -171,8 +174,9 @@ def visualize_model(model, num_images=6):
 
 #TODO: FINE-TUNING the convnet (Load a pretrained model and reset final fully connected layer)
 print('FINE-TUNING')
-model_ft = models.resnet18(pretrained=True) # calling resnet we can construct a model with random weights
-num_ftrs = model_ft.fc.in_features
+model_ft = models.resnet18(pretrained=True) # optimize weights; calling resnet we can construct a model with random weights
+print(model_ft)
+num_ftrs = model_ft.fc.in_features # change the last fully connected layer
 # Here the size of each output sample is set to 2.
 # Alternatively, it can be generalized to nn.Linear(num_ftrs, len(class_names)).
 model_ft.fc = nn.Linear(num_ftrs, 2)
@@ -199,8 +203,9 @@ visualize_model(model_ft)
 # set requires_grad == False to freeze the parameters so that the gradients are not computed in backward() )
 print('FIXED FEATURES EXTRACTOR')
 model_conv = torchvision.models.resnet18(pretrained=True)
+print(model_conv)
 for param in model_conv.parameters():
-    param.requires_grad = False
+    param.requires_grad = False #freeze all the layers in the beginning and then we set a new last fully connected layer
 
 # Parameters of newly constructed modules have requires_grad=True by default
 num_ftrs = model_conv.fc.in_features
