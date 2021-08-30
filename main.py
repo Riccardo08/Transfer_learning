@@ -172,9 +172,9 @@ def visualize_model(model, num_images=6):
 
 
 
-#TODO: FINE-TUNING the convnet (Load a pretrained model and reset final fully connected layer)
+#TODO: FINE-TUNING the convnet (Load a pretrained model and reset final fully connected layer)-------- parameters are all updated
 print('FINE-TUNING')
-model_ft = models.resnet18(pretrained=True) # optimize weights; calling resnet we can construct a model with random weights
+model_ft = models.resnet18(pretrained=True) # optimize weights
 print(model_ft)
 num_ftrs = model_ft.fc.in_features # change the last fully connected layer
 # Here the size of each output sample is set to 2.
@@ -200,7 +200,7 @@ visualize_model(model_ft)
 
 
 #TODO: ConvNet as FIXED FEATURE EXTRACTOR (Here, we need to freeze all the network except the final layer. We need to
-# set requires_grad == False to freeze the parameters so that the gradients are not computed in backward() )
+# set requires_grad == False to freeze the parameters so that the gradients are not computed in backward() ) -------- only parameters of the last layera are updated
 print('FIXED FEATURES EXTRACTOR')
 model_conv = torchvision.models.resnet18(pretrained=True)
 print(model_conv)
@@ -215,8 +215,7 @@ model_conv = model_conv.to(device)
 
 criterion = nn.CrossEntropyLoss()
 
-# Observe that only parameters of final layer are being optimized as
-# opposed to before.
+# Observe that only parameters of final layer are being optimized as opposed to before.
 optimizer_conv = optim.SGD(model_conv.fc.parameters(), lr=0.001, momentum=0.9)
 
 # Decay LR by a factor of 0.1 every 7 epochs
