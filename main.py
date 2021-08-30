@@ -24,13 +24,17 @@ plt.ion()   # interactive mode
 # Just normalization for validation
 data_transforms = {
     'train': transforms.Compose([
-        transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(),
+        transforms.RandomResizedCrop(224),  # Crops the given image at the center; Crop a random portion of image and resize it to a given size.
+                                            # If the image is torch Tensor, it is expected to have […, H, W] shape,
+                                            # where … means an arbitrary number of leading dimensions. If image size is smaller
+                                            # than output size along any edge, image is padded with 0 and then center cropped.
+        transforms.RandomHorizontalFlip(),  # Horizontally flip the given image randomly with a given probability. If the image
+                                            # is torch Tensor, it is expected to have […, H, W] shape, where … means an arbitrary number of leading dimensions
         transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]) # numbers writed on pytorch torchvision.transform library.
     ]),
     'val': transforms.Compose([
-        transforms.Resize(256),
+        transforms.Resize(256), # Resize the input image to the given size. If the image is torch Tensor, it is expected to have […, H, W] shape, where … means an arbitrary number of leading dimensions.
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
@@ -54,18 +58,6 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 #TODO: Visualize a few images
 
-def imshow(inp, title=None):
-    """Imshow for Tensor."""
-    inp = inp.numpy().transpose((1, 2, 0))
-    mean = np.array([0.485, 0.456, 0.406])
-    std = np.array([0.229, 0.224, 0.225])
-    inp = std * inp + mean
-    inp = np.clip(inp, 0, 1)
-    plt.imshow(inp)
-    if title is not None:
-        plt.title(title)
-    plt.pause(0.001)  # pause a bit so that plots are updated
-
 
 # Get a batch of training data
 inputs, classes = next(iter(dataloaders['train']))
@@ -85,7 +77,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
-        print('-' * 10)
+        print('-' * 20)
 
         # Each epoch has a training and validation phase
         for phase in ['train', 'val']:
@@ -119,7 +111,8 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
                 # Statistics
                 running_loss += loss.item() * inputs.size(0) #input.size(0) ??????????
-                running_corrects += torch.sum(preds == labels.data) # ??????????
+                running_corrects += torch.sum(preds == labels.data)
+
             if phase == 'train':
                 scheduler.step() # if we don’t call it, the learning rate won’t be changed and stays at the initial value.
 
